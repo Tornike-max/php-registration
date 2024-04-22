@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 use database\Database;
 use registration\Login;
@@ -25,10 +26,16 @@ if ($queryString && $method === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    if (isset($email) && isset($password)) {
-        $login = new Login($email, $password);
-        $login->loginUser();
-        header('Location: ./partials/homePage.php');
+    if (!empty($email) && !empty($password)) {
+        $login = new Login();
+        $isLogin = $login->loginUser($email, $password);
+        if ($isLogin) {
+            $_SESSION['user'] = $login->getUser();
+            header('Location: ./partials/homePage.php');
+            exit();
+        } else {
+            echo 'Login failed';
+        }
     }
 }
 

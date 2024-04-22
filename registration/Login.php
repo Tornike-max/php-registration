@@ -1,37 +1,54 @@
 <?php
 
+
 namespace registration;
 
+
 use database\Database;
+use Exception;
 
 class Login
 {
-    protected $email;
-    protected $password;
+    private $user;
 
-    public function __construct($email, $password)
+    public function loginUser($email, $password)
     {
-        $this->email = $email;
-        $this->password = $password;
+        if (!$this->validateCredentials($email, $password)) {
+            echo 'Invalid email or password format.';
+            return;
+        }
+
+        $db = new Database();
+        $pdo = $db->connect();
+        if (!$pdo) {
+            echo 'Database connection failed';
+            return;
+        }
+
+        $statement = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
+        $statement->bindParam(':email', $email);
+        $statement->execute();
+        $this->user = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($this->user && password_verify($password, $this->user['password'])) {
+            header('Location: ./partials/homePage.php');
+
+            exit();
+        } else {
+            echo 'Login failed: User not found or password does not match.';
+        }
     }
 
-    public function loginUser()
+    private function validateCredentials($email, $password)
     {
-        if (strpos($this->email, '@') === true && strlen($this->password) > 6) {
-            $db = new Database();
-            $pdo = $db->connect();
-            $statement = $pdo->prepare('SELECT * FROM users WHERE email = :email');
-            $statement->bindParam(':email', $this->email);
-            $user = $statement->fetch(\PDO::FETCH_ASSOC);
+        return strpos($email, '@') !== false && strlen($password) > 6;
+    }
 
-            if ($user) {
-                if (password_verify($this->password, $user['password'])) {
-                    echo 'Success';
-                    header('Location: ./partials/homePage.php');
-                } else {
-                    header('Location: ./partials/login.php');
-                }
-            }
+    public function getUser()
+    {
+        if (!$this->user) {
+            throw new Exception('No user information available.');
         }
+        return $this->user;
     }
 }

@@ -1,7 +1,19 @@
 <?php
 
 
-var_dump($_GET);
+session_start();
+
+// require_once __DIR__ . '/../vendor/autoload.php';
+
+if (!isset($_SESSION['user'])) {
+    header('Location: loginPage.php'); // Redirect to login if not logged in
+
+    exit();
+}
+
+echo "Welcome, " . htmlspecialchars($_SESSION['user']['full_name']) . "!";
+
+// Now you can use the user data
 
 ?>
 
@@ -42,6 +54,10 @@ var_dump($_GET);
             /* Slightly lighter grey for the navigation bar */
             text-align: center;
             /* Center alignment of nav items */
+        }
+
+        p {
+            font-size: x-large;
         }
 
         nav ul li {
@@ -100,7 +116,7 @@ var_dump($_GET);
 <body>
     <header>
         <h1>Welcome to My Homepage</h1>
-        <p>TORNIKE OZBETELASHVILI</p>
+        <p><?php echo $_SESSION['user']['full_name'] ?></p>
     </header>
     <nav>
         <ul>

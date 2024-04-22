@@ -34,7 +34,18 @@ class Register
             $statement->bindValue(':full_name', $this->full_name);
             $statement->bindValue(':email', $this->email);
             $statement->bindValue(':password', $hashed_password);
-            $statement->execute();
+            if ($statement->execute()) {
+                session_start();
+                $_SESSION['user'] = [
+                    'full_name' => $this->full_name,
+                    'email' => $this->email
+                ];
+                header('Location: ./partials/homePage.php');
+                exit();
+            } else {
+                header('Location: index.php?error=registrationFailed');
+                exit();
+            }
             // header('Location: ./partials/loginPage.php');
         } else {
             // header('Location: index.php');
