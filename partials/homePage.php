@@ -3,13 +3,12 @@
 
 session_start();
 
-// require_once __DIR__ . '/../vendor/autoload.php';
 
 if (!isset($_SESSION['user'])) {
     header('Location: loginPage.php'); // Redirect to login if not logged in
-
-    exit();
+    die();
 }
+
 
 echo "Welcome, " . htmlspecialchars($_SESSION['user']['full_name']) . "!";
 
@@ -123,6 +122,9 @@ echo "Welcome, " . htmlspecialchars($_SESSION['user']['full_name']) . "!";
             <li><a href="#about">About</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#contact">Contact</a></li>
+            <form action="../index.php?logout=true" method="post">
+                <button type="submit" name="logout">Log Out</button>
+            </form>
         </ul>
     </nav>
     <section id="about">
@@ -132,7 +134,7 @@ echo "Welcome, " . htmlspecialchars($_SESSION['user']['full_name']) . "!";
 
     <section id="contact">
         <h2>Contact Us</h2>
-        <p>Feel free to get in touch via email at <a href="mailto:info@example.com">info@example.com</a>.</p>
+        <p>Feel free to get in touch via email at <a href=<?php echo $_SESSION['user']['email'] ?>><?php echo $_SESSION['user']['email'] ?></a>.</p>
     </section>
     <footer>
         <p>&copy; 2024 My Simple Homepage. All rights reserved.</p>

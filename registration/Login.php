@@ -32,7 +32,6 @@ class Login
 
         if ($this->user && password_verify($password, $this->user['password'])) {
             header('Location: ./partials/homePage.php');
-
             exit();
         } else {
             echo 'Login failed: User not found or password does not match.';
@@ -43,6 +42,7 @@ class Login
     {
         return strpos($email, '@') !== false && strlen($password) > 6;
     }
+
 
     public function getUser()
     {

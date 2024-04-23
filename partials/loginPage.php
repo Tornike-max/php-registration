@@ -1,60 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - My Simple Homepage</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+use registration\Login;
 
-        .login-container {
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            width: 300px;
-        }
+if ($method ?? null === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-        .form-input {
-            margin-bottom: 10px;
-            width: 100%;
-        }
+    if (!$email) {
+        $errors[] = 'Email is Required';
+    }
+    if (!$password) {
+        $errors[] = 'Password is Required';
+    }
 
-        .form-input input {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            /* Includes padding in the input width */
-            border-radius: 4px;
-            border: 1px solid #ccc;
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            echo "<div>$error</div>";
         }
+    }
 
-        .login-button {
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+    if (isset($email) && isset($password)) {
+        $login = new Login();
+        $isLogin = $login->loginUser($email, $password);
+        if ($isLogin) {
+            $_SESSION['user'] = $login->getUser();
+            header('Location: ./partials/homePage.php');
+            exit();
+        } else {
+            $errors[] = 'Login failed';
         }
-    </style>
-</head>
+    }
+}
+
+?>
+
+
+<?php echo require_once './loginPageHeader.php' ?>
 
 <body>
     <div class="login-container">
+        <?php $errors; ?>
         <h2>Login</h2>
         <form action="../index.php?login" method="POST">
+            <?php if (!empty($errors)) : ?>
+                <?php foreach ($errors as $error) : ?>
+                    <div style="padding: 10px; border-radius:20px">
+                        <p><?php echo $error ?></p>
+                    </div>
+
+                <?php endforeach; ?>
+            <?php endif; ?>
             <div class="form-input">
                 <label for="email">Email:</label>
                 <input type="text" id="email" name="email" required>
@@ -65,6 +60,9 @@
             </div>
             <button type="submit" class="login-button">Login</button>
         </form>
+        <button type='button'>
+            <a href="./registration.php">Not Registered yet? ➡️ Register</a>
+        </button>
     </div>
 </body>
 
